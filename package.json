@@ -1,0 +1,72 @@
+{
+  "name": "code-blueprint",
+  "version": "0.3.0",
+  "description": "Structural blueprints for codebases: see which modules are load-bearing, what breaks if you remove one, and where the cracks are.",
+  "keywords": [
+    "architecture",
+    "dependency-graph",
+    "visualization",
+    "static-analysis",
+    "blueprint",
+    "microservices",
+    "impact-analysis"
+  ],
+  "homepage": "https://github.com/gianmateus/blueprint#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gianmateus/blueprint"
+  },
+  "license": "MIT",
+  "author": "Mateus Marques",
+  "type": "module",
+  "bin": {
+    "blueprint": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npm run build:viewer && npm run build:cli",
+    "build:cli": "tsc -p tsconfig.json && node scripts/copy-viewer.mjs",
+    "build:viewer": "vite build --config viewer/vite.config.ts",
+    "dev:viewer": "vite --config viewer/vite.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p viewer/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "blueprint": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "fast-glob": "^3.3.3",
+    "open": "^11.0.4",
+    "picocolors": "^1.1.1",
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/d3-selection": "^3.0.12",
+    "@types/d3-transition": "^3.0.9",
+    "@types/d3-zoom": "^3.0.9",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/vscode": "^1.85.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "d3-selection": "^3.0.1",
+    "d3-transition": "^3.0.2",
+    "d3-zoom": "^3.0.1",
+    "elkjs": "^0.12.1",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsx": "^4.23.15",
+    "vite": "^8.3.6",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^5.1.0"
+  }
+}

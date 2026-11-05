@@ -1,0 +1,3 @@
+{
+  "text": "A ride-hailing system split into five TypeScript services behind a gateway, plus a Python pricing service. Every service stands on the @ride/shared package, whose logger and error types are the true foundation of the building. Users is the busiest service: the gateway and rides both depend on it for authentication, so it is the single most load-bearing service. Postgres, Redis and RabbitMQ sit underneath as infrastructure. The biggest structural risk is the shared package: a breaking change there hits all services at once, and matching.ts and eta.ts form a small circular dependency that should be untangled."
+}

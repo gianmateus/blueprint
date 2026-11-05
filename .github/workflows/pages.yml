@@ -1,0 +1,20 @@
+# Publishes the example blueprint as a live demo on GitHub Pages.
+name: demo
+on:
+  push:
+    branches: [main]
+permissions: { contents: read, pages: write, id-token: write }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.deployment.outputs.page_url }}' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci && npm run build
+      - run: mkdir -p site && node dist/cli.js export examples/ride-hailing -o site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: deployment
+        uses: actions/deploy-pages@v4

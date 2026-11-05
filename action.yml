@@ -1,0 +1,87 @@
+name: 'Blueprint structural review'
+description: 'Comments on every pull request with its blast radius, load-bearing modules touched, new circular dependencies and new security fire routes.'
+author: 'Mateus Marques'
+branding:
+  icon: 'grid'
+  color: 'blue'
+inputs:
+  path:
+    description: 'Project folder to analyse'
+    default: '.'
+  comment:
+    description: 'Post (or update) a sticky comment on the pull request'
+    default: 'true'
+  fail-on-new-cracks:
+    description: 'Fail the check when the PR introduces a circular dependency'
+    default: 'false'
+  fail-on-fire-routes:
+    description: 'Fail the check when the PR introduces a high-severity fire route'
+    default: 'false'
+  min-score:
+    description: 'Fail the check when the structural health drops below this score'
+    default: '0'
+  github-token:
+    description: 'Token used to comment'
+    default: ${{ github.token }}
+outputs:
+  blast-radius:
+    description: 'Number of modules affected by the PR'
+    value: ${{ steps.diff.outputs.blast }}
+  score:
+    description: 'Structural health after the PR'
+    value: ${{ steps.diff.outputs.score }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Build blueprint
+      shell: bash
+      run: |
+        cd "$GITHUB_ACTION_PATH"
+        npm ci --no-audit --no-fund --loglevel=error
+        npm run build --silent
+    - name: Survey the renovation
+      id: diff
+      shell: bash
+      env:
+        BASE_REF: ${{ github.base_ref }}
+      run: |
+        BASE="${BASE_REF:-main}"
+        git fetch --no-tags origin "$BASE" >/dev/null 2>&1 || true
+        node "$GITHUB_ACTION_PATH/dist/cli.js" diff "${{ inputs.path }}" --base "origin/$BASE" \
+          --format md --out "$RUNNER_TEMP/blueprint-comment.md" \
+          --json "$RUNNER_TEMP/blueprint-diff.json" \
+          --html "$RUNNER_TEMP/blueprint.html" \
+          --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        node -e '
+          const d = require(process.env.RUNNER_TEMP + "/blueprint-diff.json");
+          const fs = require("fs");
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `blast=${d.affected.length}\nscore=${d.scoreAfter}\n`);
+        '
+        cat "$RUNNER_TEMP/blueprint-comment.md" >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload interactive blueprint
+      uses: actions/upload-artifact@v4
+      with:
+        name: blueprint
+        path: ${{ runner.temp }}/blueprint.html
+    - name: Comment on the pull request
+      if: inputs.comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: node "$GITHUB_ACTION_PATH/scripts/pr-comment.mjs" "$RUNNER_TEMP/blueprint-comment.md"
+    - name: Structural gate
+      shell: bash
+      env:
+        FAIL_CRACKS: ${{ inputs.fail-on-new-cracks }}
+        FAIL_FIRE: ${{ inputs.fail-on-fire-routes }}
+        MIN_SCORE: ${{ inputs.min-score }}
+      run: |
+        node -e '
+          const d = require(process.env.RUNNER_TEMP + "/blueprint-diff.json");
+          const problems = [];
+          if (process.env.FAIL_CRACKS === "true" && d.newCycles.length) problems.push(`${d.newCycles.length} new circular dependencies`);
+          if (process.env.FAIL_FIRE === "true" && d.newFireRoutes.some(r => r.severity === "high")) problems.push("new high-severity fire route");
+          if (d.scoreAfter < Number(process.env.MIN_SCORE || 0)) problems.push(`health ${d.scoreAfter} < ${process.env.MIN_SCORE}`);
+          if (problems.length) { console.error("Structural check failed: " + problems.join(", ")); process.exit(1); }
+          console.log("Structural check passed");
+        '

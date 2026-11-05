@@ -1,0 +1,1 @@
+{ "name": "rides", "private": true, "scripts": { "start": "tsx src/index.ts" } }

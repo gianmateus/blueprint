@@ -1,0 +1,86 @@
+{
+  "packages/shared/src/logger.ts": {
+    "summary": "Structured JSON logger every service writes through. Nothing internal below it, which is exactly why almost the whole system rests on it.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "packages/shared/src/errors.ts": {
+    "summary": "AppError and NotFound, the error types every service throws. Each error is also logged, so this file couples error handling to logging.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "packages/shared/src/http.ts": {
+    "summary": "Tiny fetch wrapper used for every service-to-service call. Turns upstream failures into 502 AppErrors.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "packages/shared/src/config.ts": {
+    "summary": "Reads required env vars and fails fast at boot. The database URL of three services goes through here.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "packages/shared/src/index.ts": {
+    "summary": "Barrel file for @ride/shared. 21 files import it, so any breaking change here ripples into every service.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/users/src/index.ts": {
+    "summary": "Front door of the users service. The gateway and rides both call it over HTTP to verify tokens and load riders.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/users/src/tokens.ts": {
+    "summary": "Verifies auth tokens, checking the Redis-backed cache first. Every authenticated request in the system ends up here.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/users/src/cache.ts": {
+    "summary": "In-memory stand-in for the Redis token cache. Small file, big blast radius: auth depends on it.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/rides/src/domain/matching.ts": {
+    "summary": "Core ride flow: finds the nearest driver, prices the trip, saves it and publishes ride.requested. Shares a circular dependency with eta.ts.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/rides/src/domain/eta.ts": {
+    "summary": "ETA maths. Imports nearestDriver back from matching.ts, which closes the only crack in the building.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/rides/src/clients/pricing.ts": {
+    "summary": "HTTP client for the Python pricing service. If pricing is down, no ride can be requested.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/rides/src/repo.ts": {
+    "summary": "Ride persistence on Postgres via DATABASE_URL.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/payments/src/ledger.ts": {
+    "summary": "Charges riders through Stripe and writes the ledger row. The only place money moves.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  },
+  "services/gateway/src/middleware/auth.ts": {
+    "summary": "Wraps every public route and verifies the caller with the users service before letting the request through.",
+    "hash": "demo",
+    "model": "hand-written demo note",
+    "at": "2026-11-05T16:00:00.000Z"
+  }
+}

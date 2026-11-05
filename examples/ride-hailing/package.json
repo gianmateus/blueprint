@@ -1,0 +1,1 @@
+{ "name": "ride-hailing", "private": true, "workspaces": ["packages/*", "services/*"] }

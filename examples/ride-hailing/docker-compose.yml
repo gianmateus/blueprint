@@ -1,0 +1,49 @@
+services:
+  gateway:
+    build: ./services/gateway
+    ports: ["8080:8080"]
+    environment:
+      USERS_URL: http://users:4001
+      RIDES_URL: http://rides:4002
+      PAYMENTS_URL: http://payments:4003
+      REDIS_URL: redis://redis:6379
+    depends_on: [users, rides, payments, redis]
+  users:
+    build: ./services/users
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/users
+      REDIS_URL: redis://redis:6379
+    depends_on: [postgres, redis]
+  rides:
+    build: ./services/rides
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/rides
+      PRICING_URL: http://pricing:5000
+      USERS_URL: http://users:4001
+      GEO_URL: http://geo:4004
+      AMQP_URL: amqp://rabbitmq:5672
+    depends_on: [postgres, rabbitmq, pricing, geo]
+  payments:
+    build: ./services/payments
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/payments
+      AMQP_URL: amqp://rabbitmq:5672
+    depends_on: [postgres, rabbitmq]
+  notifications:
+    build: ./services/notifications
+    environment:
+      AMQP_URL: amqp://rabbitmq:5672
+    depends_on: [rabbitmq]
+  pricing:
+    build: ./services/pricing
+  geo:
+    build: ./services/geo
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on: [redis]
+  postgres:
+    image: postgres:16
+  redis:
+    image: redis:7
+  rabbitmq:
+    image: rabbitmq:3-management

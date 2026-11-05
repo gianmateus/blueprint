@@ -1,0 +1,17 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # draw the example and publish it as a build artifact
+      - run: node dist/cli.js export examples/ride-hailing -o blueprint.html
+      - uses: actions/upload-artifact@v4
+        with: { name: example-blueprint, path: blueprint.html }

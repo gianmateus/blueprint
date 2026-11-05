@@ -1,0 +1,1 @@
+{ "name": "notifications", "private": true, "scripts": { "start": "tsx src/index.ts" } }

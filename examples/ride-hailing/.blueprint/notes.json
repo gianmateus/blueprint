@@ -1,0 +1,16 @@
+[
+  {
+    "id": "n1",
+    "target": "packages/shared/src/index.ts",
+    "text": "Version this package and add a changelog before the next breaking change.",
+    "author": "Mateus",
+    "createdAt": "2026-11-05T16:00:00.000Z"
+  },
+  {
+    "id": "n2",
+    "target": "services/rides/src/domain/eta.ts",
+    "text": "Move nearestDriver into its own drivers.ts to break the cycle with matching.ts.",
+    "author": "Mateus",
+    "createdAt": "2026-11-05T16:00:00.000Z"
+  }
+]
